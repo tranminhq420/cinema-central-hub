@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      text-decoration: none;
+      color: white;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 20px;
+    }
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 30px;
+    }
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    .nav-link:hover {
+      opacity: 0.8;
+    }
+
+    /* Movie Styles */
+    .movie-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+    .movie-grid {
+      display: flex;
+      flex-wrap: wrap;
+      margin: -8px;
+    }
+    .movie-item {
+      width: 33.33%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .movie-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: box-shadow 0.3s;
+    }
+    .movie-card:hover {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .movie-image {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+    }
+    .movie-content {
+      padding: 16px;
+      text-align: center;
+    }
+    .movie-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+    .movie-genre {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .movie-button {
+      background: #2563eb;
+      color: white;
+      padding: 8px 24px;
+      border-radius: 20px;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+    .movie-button:hover {
+      background: #1d4ed8;
+    }
+    .age-limit {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #dc2626;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .no-image {
+      width: 100%;
+      height: 320px;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  {% load static %}
+
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        <div class="logo-icon">🎬</div>
+        Cinema Hub
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="#" class="nav-link">Movies</a></li>
+          <li><a href="#" class="nav-link">Theaters</a></li>
+          <li><a href="#" class="nav-link">Showtimes</a></li>
+          <li><a href="#" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  {% block content %}
+  <div class="movie-container">
+    {% if films %}
+    <div class="movie-grid">
+    {% for movie in films %}
+      <div class="movie-item">
+        <div class="movie-card">
+          <div style="position: relative;">
+              {% if movie.image_url %}
+              <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-image">
+              {% else %}
+              <div class="no-image">
+                  <span>No Image</span>
+              </div>
+              {% endif %}
+
+              {% if movie.age_limit %}
+              <div class="age-limit">
+                  {{ movie.age_limit }}
+              </div>
+              {% endif %}
+          </div>
+
+          <div class="movie-content">
+              <h3 class="movie-title">
+                  {{ movie.title }}
+              </h3>
+
+              {% if movie.genre %}
+              <div>
+                  <span class="movie-genre">
+                      {{ movie.genre }}
+                  </span>
+              </div>
+              {% endif %}
+
+              {% if movie.slug %}
+                <a href="{% url 'movie_detail' movie.slug %}" class="movie-button">
+                    View Details
+                </a>
+              {% else %}
+                <span class="movie-button" style="background: #9ca3af; cursor: not-allowed;">
+                    Details Unavailable
+                </span>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  {% endif %}
+
+    
+  </div>
+  
+  <script>
+  // Filter functionality
+  document.getElementById('genre-filter').addEventListener('change', function() {
+      updateFilters();
+  });
+  
+  document.getElementById('type-filter').addEventListener('change', function() {
+      updateFilters();
+  });
+  
+  document.getElementById('format-filter').addEventListener('change', function() {
+      updateFilters();
+  });
+  
+  function updateFilters() {
+      const genre = document.getElementById('genre-filter').value;
+      const type = document.getElementById('type-filter').value;
+      const format = document.getElementById('format-filter').value;
+      
+      const params = new URLSearchParams();
+      if (genre) params.append('genre', genre);
+      if (type) params.append('movie_type', type);
+      if (format) params.append('format', format);
+      
+      window.location.href = '?' + params.toString();
+  }
+  </script>
+  {% endblock %}
+</body>
+</html>

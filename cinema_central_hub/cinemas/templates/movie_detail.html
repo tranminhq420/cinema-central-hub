@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      text-decoration: none;
+      color: white;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 20px;
+    }
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 30px;
+    }
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    .nav-link:hover {
+      opacity: 0.8;
+    }
+
+    /* Page Styles */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+    .back-link {
+      display: inline-block;
+      color: #667eea;
+      text-decoration: none;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .movie-hero {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .movie-content {
+      display: flex;
+      gap: 32px;
+      padding: 32px;
+    }
+    .movie-poster {
+      flex-shrink: 0;
+    }
+    .movie-poster img {
+      width: 300px;
+      height: 450px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .movie-info {
+      flex: 1;
+    }
+    .movie-title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+    .movie-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .meta-item {
+      background: #f3f4f6;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #4b5563;
+    }
+    .age-rating {
+      background: #fef2f2;
+      color: #dc2626;
+      font-weight: bold;
+    }
+    .genre-tag {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .movie-description {
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .price-info {
+      font-size: 18px;
+      font-weight: 600;
+      color: #059669;
+    }
+
+    /* Screenings Section */
+    .screenings-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 32px;
+    }
+    .section-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .theater-group {
+      margin-bottom: 32px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .theater-name {
+      background: #f9fafb;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .screenings-grid {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .screening-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fafafa;
+      transition: all 0.3s;
+    }
+    .screening-card:hover {
+      background: #f0f9ff;
+      border-color: #3b82f6;
+    }
+    .screening-time {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .screening-date {
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .screening-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .detail-tag {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .book-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    .book-btn:hover {
+      background: #2563eb;
+    }
+    .no-screenings {
+      text-align: center;
+      color: #6b7280;
+      padding: 48px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        <div class="logo-icon">🎬</div>
+        Cinema Hub
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="#" class="nav-link">Movies</a></li>
+          <li><a href="#" class="nav-link">Theaters</a></li>
+          <li><a href="#" class="nav-link">Showtimes</a></li>
+          <li><a href="#" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <a href="{% url 'films' %}" class="back-link">← Back to Movies</a>
+    
+    <!-- Movie Information -->
+    <div class="movie-hero">
+      <div class="movie-content">
+        <div class="movie-poster">
+          {% if film.image_url %}
+            <img src="{{ film.image_url }}" alt="{{ film.title }}">
+          {% else %}
+            <div style="width: 300px; height: 450px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #6b7280;">
+              No Image Available
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="movie-info">
+          <h1 class="movie-title">{{ film.title }}</h1>
+          
+          <div class="movie-meta">
+            {% if film.age_limit %}
+              <span class="meta-item age-rating">{{ film.age_limit }}</span>
+            {% endif %}
+            {% if film.genre %}
+              <span class="meta-item genre-tag">{{ film.genre }}</span>
+            {% endif %}
+            {% if film.movie_type %}
+              <span class="meta-item">{{ film.movie_type }}</span>
+            {% endif %}
+            {% if film.format %}
+              <span class="meta-item">{{ film.format }}</span>
+            {% endif %}
+          </div>
+          
+          {% if film.description %}
+            <div class="movie-description">
+              {{ film.description }}
+            </div>
+          {% endif %}
+          
+          {% if film.price %}
+            <div class="price-info">
+              Price: {{ film.price }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Screenings Section -->
+    <div class="screenings-section">
+      <h2 class="section-title">
+        🎭 Showtimes ({{ total_screenings }} screenings available)
+      </h2>
+      
+      {% if theaters %}
+        {% for theater_name, screenings in theaters.items %}
+          <div class="theater-group">
+            <div class="theater-name">{{ theater_name }}</div>
+            <div class="screenings-grid">
+              {% for screening in screenings %}
+                <div class="screening-card">
+                  <div class="screening-time">{{ screening.time|time:"H:i" }}</div>
+                  <div class="screening-date">
+                    {% if screening.proper_date %}
+                      {{ screening.proper_date|date:"l, F d, Y" }}
+                    {% else %}
+                      Unable to parse date: {{ screening.date }}
+                    {% endif %}
+                  </div>
+                  <div class="screening-details">
+                    {% if screening.format %}
+                      <span class="detail-tag">{{ screening.format }}</span>
+                    {% endif %}
+                    {% if screening.language %}
+                      <span class="detail-tag">{{ screening.language }}</span>
+                    {% endif %}
+                    {% if screening.firstclass == 'True' %}
+                      <span class="detail-tag">First Class</span>
+                    {% endif %}
+                  </div>
+                  <a href="{{ film.booking_url }}" target="_blank" class="book-btn">
+                    Book Tickets
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-screenings">
+          <p>No screenings available for this movie at the moment.</p>
+          <p>Please check back later or contact us for more information.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    function bookTicket(screeningId) {
+      // You can implement booking functionality here
+      alert('Booking functionality will be implemented. Screening ID: ' + screeningId);
+    }
+  </script>
+</body>
+</html> 
