@@ -150,11 +150,15 @@
       </a>
       <nav>
         <ul class="nav-menu">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="#" class="nav-link">Movies</a></li>
+          <li><a href="{% url 'films' %}" class="nav-link">Home</a></li>
           <li><a href="#" class="nav-link">Theaters</a></li>
-          <li><a href="#" class="nav-link">Showtimes</a></li>
-          <li><a href="#" class="nav-link">Contact</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'my_shows' %}" class="nav-link">Showtimes</a></li>
+            <li><a href="{% url 'logout' %}" class="nav-link">Logout ({{ user.username }})</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+            <li><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+          {% endif %}
         </ul>
       </nav>
     </div>

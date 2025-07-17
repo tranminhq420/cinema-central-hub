@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Film(models.Model):
     title = models.CharField(max_length=100, null=True)
@@ -85,3 +86,23 @@ class SeatData(models.Model):
     class Meta:
         managed = False
         db_table = 'seat_data'
+
+
+class UserShowing(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    screening_id = models.IntegerField()  # References Screentime.id
+    film_slug = models.CharField(max_length=200)  # Store film slug for easy access
+    added_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('user', 'screening_id')  # Prevent duplicate entries
+
+    def __str__(self):
+        return f"{self.user.username} - Screening {self.screening_id}"
+
+    def get_screening(self):
+        """Helper method to get the actual screening object"""
+        try:
+            return Screentime.objects.get(id=self.screening_id)
+        except Screentime.DoesNotExist:
+            return None

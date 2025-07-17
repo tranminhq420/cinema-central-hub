@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      text-decoration: none;
+      color: white;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 20px;
+    }
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 30px;
+    }
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    .nav-link:hover {
+      opacity: 0.8;
+    }
+
+    /* Page Styles */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+    .page-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      color: #6b7280;
+      margin-bottom: 32px;
+      font-size: 18px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 64px 32px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    .empty-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .empty-text {
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+    .empty-link {
+      background: #667eea;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-block;
+    }
+    .empty-link:hover {
+      background: #5a67d8;
+    }
+    .film-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .film-header {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .film-poster {
+      flex-shrink: 0;
+    }
+    .film-poster img {
+      width: 120px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .film-info {
+      flex: 1;
+    }
+    .film-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+    .film-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .meta-tag {
+      background: #f3f4f6;
+      color: #4b5563;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    .showings-grid {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .showing-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fafafa;
+      position: relative;
+    }
+    .showing-time {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .showing-date {
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .showing-theater {
+      color: #374151;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .showing-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .detail-tag {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    .remove-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+    .remove-btn:hover {
+      background: #b91c1c;
+    }
+    .added-date {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-container">
+      <a href="{% url 'films' %}" class="logo">
+        <div class="logo-icon">🎬</div>
+        Cinema Hub
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="{% url 'films' %}" class="nav-link">Home</a></li>
+          <li><a href="#" class="nav-link">Theaters</a></li>
+          <li><a href="{% url 'my_shows' %}" class="nav-link" style="opacity: 0.8;">Showtimes</a></li>
+          <li><a href="{% url 'logout' %}" class="nav-link">Logout ({{ user.username }})</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="page-title">My Shows</h1>
+    <p class="page-subtitle">Showings you've marked to attend ({{ total_showings }} total)</p>
+    
+    {% if films_data %}
+      {% for film_slug, film_data in films_data.items %}
+        <div class="film-section">
+          <div class="film-header">
+            <div class="film-poster">
+              {% if film_data.film.image_url %}
+                <img src="{{ film_data.film.image_url }}" alt="{{ film_data.film.title }}">
+              {% else %}
+                <div style="width: 120px; height: 180px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #6b7280; font-size: 12px;">
+                  No Image
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="film-info">
+              <h2 class="film-title">{{ film_data.film.title }}</h2>
+              <div class="film-meta">
+                {% if film_data.film.genre %}
+                  <span class="meta-tag">{{ film_data.film.genre }}</span>
+                {% endif %}
+                {% if film_data.film.age_limit %}
+                  <span class="meta-tag">{{ film_data.film.age_limit }}</span>
+                {% endif %}
+                {% if film_data.film.format %}
+                  <span class="meta-tag">{{ film_data.film.format }}</span>
+                {% endif %}
+              </div>
+              <p style="color: #6b7280; font-size: 14px;">
+                {{ film_data.screenings|length }} showing{{ film_data.screenings|length|pluralize }} saved
+              </p>
+            </div>
+          </div>
+          
+          <div class="showings-grid">
+            {% for screening in film_data.screenings %}
+              <div class="showing-card">
+                <button onclick="removeShowing({{ screening.id }})" class="remove-btn" id="remove-{{ screening.id }}">
+                  Remove
+                </button>
+                
+                <div class="showing-time">{{ screening.time|time:"H:i" }}</div>
+                <div class="showing-date">
+                  {% if screening.proper_date %}
+                    {{ screening.proper_date|date:"l, F d, Y" }}
+                  {% else %}
+                    {{ screening.date }}
+                  {% endif %}
+                </div>
+                <div class="showing-theater">📍 {{ screening.theater_name }}</div>
+                
+                <div class="showing-details">
+                  {% if screening.format %}
+                    <span class="detail-tag">{{ screening.format }}</span>
+                  {% endif %}
+                  {% if screening.language %}
+                    <span class="detail-tag">{{ screening.language }}</span>
+                  {% endif %}
+                  {% if screening.firstclass == 'True' %}
+                    <span class="detail-tag">First Class</span>
+                  {% endif %}
+                </div>
+                
+                <div class="added-date">
+                  Added {{ screening.user_showing.added_at|date:"M d, Y" }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🎭</div>
+        <h2 class="empty-title">No Shows Added Yet</h2>
+        <p class="empty-text">Start adding shows you want to attend to keep track of them here.</p>
+        <a href="{% url 'films' %}" class="empty-link">Browse Movies</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    function removeShowing(screeningId) {
+      if (!confirm('Are you sure you want to remove this showing from your list?')) {
+        return;
+      }
+
+      const csrftoken = getCookie('csrftoken');
+      
+      fetch("{% url 'remove_from_my_shows' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'screening_id=' + screeningId
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Remove the showing card from the page
+          const card = document.getElementById('remove-' + screeningId).closest('.showing-card');
+          card.style.opacity = '0.5';
+          card.style.transition = 'opacity 0.3s';
+          setTimeout(() => {
+            location.reload(); // Reload to update the page
+          }, 300);
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+      });
+    }
+  </script>
+</body>
+</html> 

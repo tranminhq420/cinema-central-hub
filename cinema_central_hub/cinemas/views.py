@@ -1,8 +1,14 @@
 from django.shortcuts import render
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Film, Screentime, Theater
+from .models import Film, Screentime, Theater, UserShowing
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 import re
 from datetime import datetime
 
@@ -71,6 +77,15 @@ def movie_detail(request, film_slug):
     # Parse custom date format and add proper date to each screening
     for screening in screenings:
         screening.proper_date = parse_custom_date(screening.date)
+        
+        # Check if user has added this screening to their list
+        if request.user.is_authenticated:
+            screening.is_saved = UserShowing.objects.filter(
+                user=request.user, 
+                screening_id=screening.id
+            ).exists()
+        else:
+            screening.is_saved = False
     
     # Group screenings by theater
     theaters = {}
@@ -88,8 +103,142 @@ def movie_detail(request, film_slug):
     context = {
         'film': film,
         'theaters': theaters,
-        'total_screenings': screenings.count()
+        'total_screenings': screenings.count(),
+        'film_slug': film_slug
     }
     
     return render(request, 'movie_detail.html', context)
+
+def register_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            # messages.success(request, f'Account created for {username}! You can now log in.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                # messages.success(request, f'Welcome back, {username}!')
+                next_url = request.GET.get('next', 'films')
+                return redirect(next_url)
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = CustomAuthenticationForm()
+    
+    return render(request, 'login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    # messages.success(request, 'You have been logged out successfully.')
+    return redirect('films')
+
+@login_required
+@require_POST
+def add_to_my_shows(request):
+    screening_id = request.POST.get('screening_id')
+    film_slug = request.POST.get('film_slug')
+    
+    if not screening_id or not film_slug:
+        return JsonResponse({'success': False, 'error': 'Missing data'})
+    
+    try:
+        # Check if screening exists
+        screening = get_object_or_404(Screentime, id=screening_id)
+        
+        # Create or get the UserShowing entry
+        user_showing, created = UserShowing.objects.get_or_create(
+            user=request.user,
+            screening_id=int(screening_id),
+            defaults={'film_slug': film_slug}
+        )
+        
+        if created:
+            return JsonResponse({'success': True, 'action': 'added'})
+        else:
+            return JsonResponse({'success': True, 'action': 'already_exists'})
+            
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@require_POST
+def remove_from_my_shows(request):
+    screening_id = request.POST.get('screening_id')
+    
+    if not screening_id:
+        return JsonResponse({'success': False, 'error': 'Missing screening ID'})
+    
+    try:
+        user_showing = UserShowing.objects.get(
+            user=request.user,
+            screening_id=int(screening_id)
+        )
+        user_showing.delete()
+        return JsonResponse({'success': True, 'action': 'removed'})
+        
+    except UserShowing.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Showing not found in your list'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def my_shows(request):
+    # Get all user showings
+    user_showings = UserShowing.objects.filter(user=request.user).order_by('-added_at')
+    
+    # Group by film
+    films_data = {}
+    for user_showing in user_showings:
+        screening = user_showing.get_screening()
+        if screening:
+            film_slug = user_showing.film_slug
+            
+            if film_slug not in films_data:
+                # Find the film
+                try:
+                    films = Film.objects.filter(booking_url__icontains=film_slug)
+                    if films.exists():
+                        film = films.first()
+                        films_data[film_slug] = {
+                            'film': film,
+                            'screenings': []
+                        }
+                except:
+                    continue
+            
+            if film_slug in films_data:
+                screening.proper_date = parse_custom_date(screening.date)
+                screening.user_showing = user_showing
+                
+                # Get theater info
+                try:
+                    theater = Theater.objects.get(theater_id=screening.cinema_id)
+                    screening.theater_name = theater.name
+                except Theater.DoesNotExist:
+                    screening.theater_name = f"Theater {screening.cinema_id}"
+                
+                films_data[film_slug]['screenings'].append(screening)
+    
+    context = {
+        'films_data': films_data,
+        'total_showings': user_showings.count()
+    }
+    
+    return render(request, 'my_shows.html', context)
     
