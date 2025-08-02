@@ -1,0 +1,149 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ action }} User - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+            <div class="px-4 sm:px-0">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">{{ action }} User</h3>
+                <p class="mt-1 text-sm text-gray-600">
+                    {% if action == 'Create' %}
+                        Add a new user to the system.
+                    {% else %}
+                        Update user information and permissions.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <form method="post">
+                {% csrf_token %}
+                <div class="shadow sm:rounded-md sm:overflow-hidden">
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {% if form.non_field_errors %}
+                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.username.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First name</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last name</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            {% if action == 'Create' %}
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+                                {% endif %}
+                                {% if form.password1.help_text %}
+                                    <p class="mt-2 text-sm text-gray-500">{{ form.password1.help_text }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+                                {% endif %}
+                                {% if form.password2.help_text %}
+                                    <p class="mt-2 text-sm text-gray-500">{{ form.password2.help_text }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Admin Access Checkboxes for Create User -->
+                            <div class="col-span-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <div class="flex items-center h-5">
+                                            {{ form.is_active }}
+                                        </div>
+                                        <div class="ml-3 text-sm">
+                                            <label for="{{ form.is_active.id_for_label }}" class="font-medium text-gray-700">Active</label>
+                                            <p class="text-gray-500">{{ form.is_active.help_text|default:"User can log in and access the system." }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start">
+                                        <div class="flex items-center h-5">
+                                            {{ form.is_staff }}
+                                        </div>
+                                        <div class="ml-3 text-sm">
+                                            <label for="{{ form.is_staff.id_for_label }}" class="font-medium text-gray-700">Admin Access</label>
+                                            <p class="text-gray-500">{{ form.is_staff.help_text|default:"User can access admin areas and manage other users." }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if action == 'Edit' and form.is_active %}
+                            <div class="col-span-6">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        {{ form.is_active }}
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label for="{{ form.is_active.id_for_label }}" class="font-medium text-gray-700">Active</label>
+                                        <p class="text-gray-500">User can log in and access the system.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-span-6">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        {{ form.is_staff }}
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label for="{{ form.is_staff.id_for_label }}" class="font-medium text-gray-700">Staff</label>
+                                        <p class="text-gray-500">User can access admin areas.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 space-x-3">
+                        <a href="{% if action == 'Edit' %}{% url 'user_admin:user_detail' user_detail.id %}{% else %}{% url 'user_admin:user_list' %}{% endif %}" class="btn-secondary">Cancel</a>
+                        <button type="submit" class="btn-primary">{{ action }} User</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

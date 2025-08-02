@@ -18,11 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
+
 def root_redirect(request):
     return redirect('films')
+
 
 urlpatterns = [
     path('', root_redirect, name='root'),
     path('cinemas/', include('cinemas.urls')),
     path('admin/', admin.site.urls),
+    path('user-admin/', include('cinemas.admin_urls')),
 ]
