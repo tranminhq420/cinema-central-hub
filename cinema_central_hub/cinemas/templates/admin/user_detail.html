@@ -3,114 +3,415 @@
 {% block title %}{{ user_detail.username }} - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="px-4 py-6 sm:px-0">
-    <div class="lg:flex lg:items-center lg:justify-between">
-        <div class="flex-1 min-w-0">
-            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                {{ user_detail.get_full_name|default:user_detail.username }}
-            </h2>
-            <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
-                <div class="mt-2 flex items-center text-sm text-gray-500">
-                    <i class="fas fa-user mr-1.5"></i>
-                    @{{ user_detail.username }}
-                </div>
-                <div class="mt-2 flex items-center text-sm text-gray-500">
-                    <i class="fas fa-envelope mr-1.5"></i>
-                    {{ user_detail.email }}
-                </div>
-                <div class="mt-2 flex items-center text-sm text-gray-500">
-                    <i class="fas fa-calendar mr-1.5"></i>
-                    Joined {{ user_detail.date_joined|date:"F d, Y" }}
+<style>
+    /* User Detail Styles */
+    .user-detail-container {
+        padding: 0;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .user-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        padding: 32px;
+        margin-bottom: 24px;
+    }
+
+    .user-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+    .user-info-main {
+        flex: 1;
+    }
+
+    .user-name {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-name i {
+        color: #8b5cf6;
+        font-size: 28px;
+    }
+
+    .user-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        margin-bottom: 16px;
+    }
+
+    .user-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .user-meta-item i {
+        color: #8b5cf6;
+        font-size: 16px;
+        width: 16px;
+    }
+
+    .user-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .action-btn.edit {
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        color: white;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    }
+
+    .action-btn.toggle {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .action-btn.delete {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+    }
+
+    /* User Details Card */
+    .user-details-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 24px 32px;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%);
+    }
+
+    .card-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-title i {
+        color: #8b5cf6;
+        font-size: 18px;
+    }
+
+    .card-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .details-list {
+        padding: 0;
+    }
+
+    .detail-item {
+        padding: 20px 32px;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+    }
+
+    .status-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-badge.active {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .status-badge.inactive {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .status-badge.staff {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
+        color: #6366f1;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .status-badge.superuser {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
+        color: #8b5cf6;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        color: #1f2937;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        border: 1px solid #e5e7eb;
+        margin-top: 24px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .user-header-content {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .user-name {
+            font-size: 24px;
+        }
+
+        .user-meta {
+            gap: 16px;
+        }
+
+        .user-actions {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+        .action-btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .detail-item {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-header {
+            padding: 20px;
+        }
+
+        .user-name {
+            font-size: 20px;
+        }
+
+        .user-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .user-actions {
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 20px;
+        }
+
+        .detail-item {
+            padding: 16px 20px;
+        }
+    }
+</style>
+
+<div class="user-detail-container">
+    <div class="user-header">
+        <div class="user-header-content">
+            <div class="user-info-main">
+                <h1 class="user-name">
+                    <i class="fas fa-user"></i>
+                    {{ user_detail.get_full_name|default:user_detail.username }}
+                </h1>
+                <div class="user-meta">
+                    <div class="user-meta-item">
+                        <i class="fas fa-user"></i>
+                        @{{ user_detail.username }}
+                    </div>
+                    <div class="user-meta-item">
+                        <i class="fas fa-envelope"></i>
+                        {{ user_detail.email }}
+                    </div>
+                    <div class="user-meta-item">
+                        <i class="fas fa-calendar"></i>
+                        Joined {{ user_detail.date_joined|date:"F d, Y" }}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="mt-5 flex lg:mt-0 lg:ml-4">
-            <span class="sm:ml-3">
-                <a href="{% url 'user_admin:user_edit' user_detail.id %}" class="btn-primary">
-                    <i class="fas fa-edit mr-2"></i>Edit User
+            <div class="user-actions">
+                <a href="{% url 'user_admin:user_edit' user_detail.id %}" class="action-btn edit">
+                    <i class="fas fa-edit"></i>
+                    Edit User
                 </a>
-            </span>
-            <span class="ml-3">
-                <button type="button" onclick="toggleUserStatus({{ user_detail.id }})" class="btn-secondary">
+                <button type="button" onclick="toggleUserStatus({{ user_detail.id }})" class="action-btn toggle">
                     {% if user_detail.is_active %}
-                        <i class="fas fa-user-times mr-2"></i>Deactivate
+                        <i class="fas fa-user-times"></i>
+                        Deactivate
                     {% else %}
-                        <i class="fas fa-user-check mr-2"></i>Activate
+                        <i class="fas fa-user-check"></i>
+                        Activate
                     {% endif %}
                 </button>
-            </span>
-            {% if not user_detail.is_superuser and user_detail != user %}
-            <span class="ml-3">
-                <form method="post" action="{% url 'user_admin:user_delete' user_detail.id %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                {% if not user_detail.is_superuser and user_detail != user %}
+                <form method="post" action="{% url 'user_admin:user_delete' user_detail.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this user?')">
                     {% csrf_token %}
-                    <button type="submit" class="btn-danger">
-                        <i class="fas fa-trash mr-2"></i>Delete
+                    <button type="submit" class="action-btn delete">
+                        <i class="fas fa-trash"></i>
+                        Delete
                     </button>
                 </form>
-            </span>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="mt-8">
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">User Information</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">Personal details and account status.</p>
-            </div>
-            <div class="border-t border-gray-200">
-                <dl>
-                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Full name</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user_detail.get_full_name|default:"Not provided" }}</dd>
-                    </div>
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Username</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user_detail.username }}</dd>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Email address</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user_detail.email }}</dd>
-                    </div>
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Account status</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            <div class="flex space-x-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if user_detail.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                    {% if user_detail.is_active %}Active{% else %}Inactive{% endif %}
-                                </span>
-                                {% if user_detail.is_staff %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Staff</span>
-                                {% endif %}
-                                {% if user_detail.is_superuser %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Superuser</span>
-                                {% endif %}
-                            </div>
-                        </dd>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Date joined</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user_detail.date_joined|date:"F d, Y g:i A" }}</dd>
-                    </div>
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Last login</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            {% if user_detail.last_login %}
-                                {{ user_detail.last_login|date:"F d, Y g:i A" }}
-                            {% else %}
-                                Never
-                            {% endif %}
-                        </dd>
-                    </div>
-                </dl>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="mt-6">
-        <a href="{% url 'user_admin:user_list' %}" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Users
-        </a>
+    <div class="user-details-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-info-circle"></i>
+                User Information
+            </h3>
+            <p class="card-subtitle">Personal details and account status</p>
+        </div>
+        
+        <div class="details-list">
+            <div class="detail-item">
+                <div class="detail-label">Full Name</div>
+                <div class="detail-value">{{ user_detail.get_full_name|default:"Not provided" }}</div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">Username</div>
+                <div class="detail-value">{{ user_detail.username }}</div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">Email Address</div>
+                <div class="detail-value">{{ user_detail.email }}</div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">Account Status</div>
+                <div class="detail-value">
+                    <div class="status-badges">
+                        <span class="status-badge {% if user_detail.is_active %}active{% else %}inactive{% endif %}">
+                            <i class="fas fa-{% if user_detail.is_active %}check-circle{% else %}times-circle{% endif %}"></i>
+                            {% if user_detail.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                        {% if user_detail.is_staff %}
+                        <span class="status-badge staff">
+                            <i class="fas fa-user-shield"></i> Staff
+                        </span>
+                        {% endif %}
+                        {% if user_detail.is_superuser %}
+                        <span class="status-badge superuser">
+                            <i class="fas fa-crown"></i> Superuser
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">Date Joined</div>
+                <div class="detail-value">{{ user_detail.date_joined|date:"F d, Y g:i A" }}</div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">Last Login</div>
+                <div class="detail-value">
+                    {% if user_detail.last_login %}
+                        {{ user_detail.last_login|date:"F d, Y g:i A" }}
+                    {% else %}
+                        Never
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
+
+    <a href="{% url 'user_admin:user_list' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Users
+    </a>
 </div>
 {% endblock %}

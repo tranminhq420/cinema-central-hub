@@ -3,147 +3,487 @@
 {% block title %}{{ action }} User - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="px-4 py-6 sm:px-0">
-    <div class="md:grid md:grid-cols-3 md:gap-6">
-        <div class="md:col-span-1">
-            <div class="px-4 sm:px-0">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">{{ action }} User</h3>
-                <p class="mt-1 text-sm text-gray-600">
-                    {% if action == 'Create' %}
-                        Add a new user to the system.
-                    {% else %}
-                        Update user information and permissions.
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-        <div class="mt-5 md:mt-0 md:col-span-2">
-            <form method="post">
-                {% csrf_token %}
-                <div class="shadow sm:rounded-md sm:overflow-hidden">
-                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
-                        {% if form.non_field_errors %}
-                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                                {{ form.non_field_errors }}
+<style>
+    /* User Form Styles */
+    .user-form-container {
+        padding: 0;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        margin-bottom: 32px;
+        text-align: center;
+    }
+
+    .form-title {
+        font-size: 32px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .form-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+        font-weight: 500;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        overflow: hidden;
+    }
+
+    .form-content {
+        padding: 40px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #8b5cf6;
+        font-size: 16px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 14px;
+        background: white;
+        font-family: inherit;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: #6b7280;
+        opacity: 0.7;
+    }
+
+    .form-error {
+        color: #ef4444;
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .form-help {
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 6px;
+        font-style: italic;
+    }
+
+    /* Checkbox Styles */
+    .checkbox-group {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 24px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(139, 92, 246, 0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .checkbox-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .checkbox-input {
+        width: 20px;
+        height: 20px;
+        accent-color: #8b5cf6;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    .checkbox-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .checkbox-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        line-height: 1.4;
+    }
+
+    .checkbox-label i {
+        color: #8b5cf6;
+        font-size: 14px;
+        width: 16px;
+        text-align: center;
+    }
+
+    .checkbox-description {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-top: 4px;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        padding: 24px 40px;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+        border-top: 1px solid rgba(139, 92, 246, 0.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .cancel-btn {
+        padding: 12px 24px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        background: white;
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        color: white;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    }
+
+    /* Error Messages */
+    .form-errors {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 24px;
+        color: #ef4444;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .form-content {
+            padding: 24px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .form-title {
+            font-size: 24px;
+        }
+
+        .form-actions {
+            padding: 20px 24px;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cancel-btn,
+        .submit-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-content {
+            padding: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+        }
+
+        .checkbox-group {
+            padding: 16px;
+        }
+
+        .checkbox-item {
+            padding: 12px;
+        }
+    }
+</style>
+
+<div class="user-form-container">
+    <div class="form-header">
+        <h1 class="form-title">
+            <i class="fas fa-{% if action == 'Create' %}user-plus{% else %}user-edit{% endif %}"></i>
+            {{ action }} User
+        </h1>
+        <p class="form-subtitle">
+            {% if action == 'Create' %}
+                Add a new user to the system with appropriate permissions and access levels.
+            {% else %}
+                Update user information, permissions, and access levels for this account.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-content">
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Username
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-times-circle"></i>
+                                {{ form.username.errors.0 }}
                             </div>
                         {% endif %}
+                    </div>
 
-                        <div class="grid grid-cols-6 gap-6">
-                            <div class="col-span-6 sm:col-span-3">
-                                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
-                                {{ form.username }}
-                                {% if form.username.errors %}
-                                    <p class="mt-2 text-sm text-red-600">{{ form.username.errors.0 }}</p>
-                                {% endif %}
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Email Address
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-times-circle"></i>
+                                {{ form.email.errors.0 }}
                             </div>
+                        {% endif %}
+                    </div>
 
-                            <div class="col-span-6 sm:col-span-3">
-                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
-                                {{ form.email }}
-                                {% if form.email.errors %}
-                                    <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
-                                {% endif %}
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-id-card"></i>
+                            First Name
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-times-circle"></i>
+                                {{ form.first_name.errors.0 }}
                             </div>
+                        {% endif %}
+                    </div>
 
-                            <div class="col-span-6 sm:col-span-3">
-                                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First name</label>
-                                {{ form.first_name }}
-                                {% if form.first_name.errors %}
-                                    <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
-                                {% endif %}
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-id-card"></i>
+                            Last Name
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-times-circle"></i>
+                                {{ form.last_name.errors.0 }}
                             </div>
+                        {% endif %}
+                    </div>
 
-                            <div class="col-span-6 sm:col-span-3">
-                                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last name</label>
-                                {{ form.last_name }}
-                                {% if form.last_name.errors %}
-                                    <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
-                                {% endif %}
+                    {% if action == 'Create' %}
+                    <div class="form-group">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-times-circle"></i>
+                                {{ form.password1.errors.0 }}
                             </div>
+                        {% endif %}
+                        {% if form.password1.help_text %}
+                            <div class="form-help">{{ form.password1.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                            {% if action == 'Create' %}
-                            <div class="col-span-6 sm:col-span-3">
-                                <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
-                                {{ form.password1 }}
-                                {% if form.password1.errors %}
-                                    <p class="mt-2 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
-                                {% endif %}
-                                {% if form.password1.help_text %}
-                                    <p class="mt-2 text-sm text-gray-500">{{ form.password1.help_text }}</p>
-                                {% endif %}
+                    <div class="form-group">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Confirm Password
+                        </label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-times-circle"></i>
+                                {{ form.password2.errors.0 }}
                             </div>
+                        {% endif %}
+                        {% if form.password2.help_text %}
+                            <div class="form-help">{{ form.password2.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                            <div class="col-span-6 sm:col-span-3">
-                                <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                                {{ form.password2 }}
-                                {% if form.password2.errors %}
-                                    <p class="mt-2 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
-                                {% endif %}
-                                {% if form.password2.help_text %}
-                                    <p class="mt-2 text-sm text-gray-500">{{ form.password2.help_text }}</p>
-                                {% endif %}
-                            </div>
-
-                            <!-- Admin Access Checkboxes for Create User -->
-                            <div class="col-span-6">
-                                <div class="space-y-4">
-                                    <div class="flex items-start">
-                                        <div class="flex items-center h-5">
-                                            {{ form.is_active }}
-                                        </div>
-                                        <div class="ml-3 text-sm">
-                                            <label for="{{ form.is_active.id_for_label }}" class="font-medium text-gray-700">Active</label>
-                                            <p class="text-gray-500">{{ form.is_active.help_text|default:"User can log in and access the system." }}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-start">
-                                        <div class="flex items-center h-5">
-                                            {{ form.is_staff }}
-                                        </div>
-                                        <div class="ml-3 text-sm">
-                                            <label for="{{ form.is_staff.id_for_label }}" class="font-medium text-gray-700">Admin Access</label>
-                                            <p class="text-gray-500">{{ form.is_staff.help_text|default:"User can access admin areas and manage other users." }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                            {% if action == 'Edit' and form.is_active %}
-                            <div class="col-span-6">
-                                <div class="flex items-start">
-                                    <div class="flex items-center h-5">
-                                        {{ form.is_active }}
-                                    </div>
-                                    <div class="ml-3 text-sm">
-                                        <label for="{{ form.is_active.id_for_label }}" class="font-medium text-gray-700">Active</label>
-                                        <p class="text-gray-500">User can log in and access the system.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-span-6">
-                                <div class="flex items-start">
-                                    <div class="flex items-center h-5">
-                                        {{ form.is_staff }}
-                                    </div>
-                                    <div class="ml-3 text-sm">
-                                        <label for="{{ form.is_staff.id_for_label }}" class="font-medium text-gray-700">Staff</label>
-                                        <p class="text-gray-500">User can access admin areas.</p>
+                    <!-- Admin Access Checkboxes for Create User -->
+                    <div class="form-group full-width">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="{{ form.is_active.name }}" id="{{ form.is_active.id_for_label }}" 
+                                       class="checkbox-input" {% if form.is_active.value %}checked{% endif %}>
+                                <div class="checkbox-content">
+                                    <label for="{{ form.is_active.id_for_label }}" class="checkbox-label">
+                                        <i class="fas fa-check-circle"></i>
+                                        Active Account
+                                    </label>
+                                    <div class="checkbox-description">
+                                        Designates whether this user should be treated as active. Unselecting this instead of deleting accounts.
                                     </div>
                                 </div>
                             </div>
-                            {% endif %}
+
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="{{ form.is_staff.name }}" id="{{ form.is_staff.id_for_label }}" 
+                                       class="checkbox-input" {% if form.is_staff.value %}checked{% endif %}>
+                                <div class="checkbox-content">
+                                    <label for="{{ form.is_staff.id_for_label }}" class="checkbox-label">
+                                        <i class="fas fa-user-shield"></i>
+                                        Admin Access
+                                    </label>
+                                    <div class="checkbox-description">
+                                        Designates whether the user can access admin areas and manage other users.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 space-x-3">
-                        <a href="{% if action == 'Edit' %}{% url 'user_admin:user_detail' user_detail.id %}{% else %}{% url 'user_admin:user_list' %}{% endif %}" class="btn-secondary">Cancel</a>
-                        <button type="submit" class="btn-primary">{{ action }} User</button>
+                    {% endif %}
+
+                    {% if action == 'Edit' and form.is_active %}
+                    <div class="form-group full-width">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="{{ form.is_active.name }}" id="{{ form.is_active.id_for_label }}" 
+                                       class="checkbox-input" {% if form.is_active.value %}checked{% endif %}>
+                                <div class="checkbox-content">
+                                    <label for="{{ form.is_active.id_for_label }}" class="checkbox-label">
+                                        <i class="fas fa-check-circle"></i>
+                                        Active Account
+                                    </label>
+                                    <div class="checkbox-description">
+                                        User can log in and access the system. Uncheck to deactivate this account.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="{{ form.is_staff.name }}" id="{{ form.is_staff.id_for_label }}" 
+                                       class="checkbox-input" {% if form.is_staff.value %}checked{% endif %}>
+                                <div class="checkbox-content">
+                                    <label for="{{ form.is_staff.id_for_label }}" class="checkbox-label">
+                                        <i class="fas fa-user-shield"></i>
+                                        Staff Access
+                                    </label>
+                                    <div class="checkbox-description">
+                                        User can access admin areas and manage other users.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    {% endif %}
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% if action == 'Edit' %}{% url 'user_admin:user_detail' user_detail.id %}{% else %}{% url 'user_admin:user_list' %}{% endif %}" class="cancel-btn">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-{% if action == 'Create' %}plus{% else %}save{% endif %}"></i>
+                    {{ action }} User
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

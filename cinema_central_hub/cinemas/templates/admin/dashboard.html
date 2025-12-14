@@ -3,117 +3,586 @@
 {% block title %}Dashboard - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="px-4 py-6 sm:px-0">
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p class="mt-2 text-sm text-gray-600">Overview of user management system</p>
+<style>
+    /* Dashboard Styles */
+    .dashboard-container {
+        padding: 0;
+    }
+
+    .dashboard-header {
+        margin-bottom: 32px;
+    }
+
+    .dashboard-title {
+        font-size: 36px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        -webkit-background-clip: text;
+        background-clip: text;
+        margin-bottom: 8px;
+        color: black;
+    }
+
+    .dashboard-subtitle {
+        color: #6b7280;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    /* Charts Section */
+    .charts-section {
+        margin-bottom: 40px;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .chart-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #8b5cf6, #a855f7);
+    }
+
+    .chart-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .chart-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .chart-title i {
+        color: #8b5cf6;
+    }
+
+    .chart-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    /* Summary Cards */
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .summary-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        text-align: center;
+    }
+
+    .summary-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+
+    .summary-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Recent Users Section */
+    .recent-users-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 32px 32px 24px;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%);
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title i {
+        color: #8b5cf6;
+        font-size: 20px;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .view-all-link {
+        color: #8b5cf6;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .users-list {
+        padding: 0;
+    }
+
+    .user-item {
+        padding: 20px 32px;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .user-item:last-child {
+        border-bottom: none;
+    }
+
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-email {
+        font-size: 14px;
+        color: #6b7280;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .user-status.active {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .user-status.inactive {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .empty-state {
+        padding: 60px 32px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 32px;
+        color: white;
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+
+    .empty-text {
+        color: #6b7280;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 28px;
+        }
+
+        .charts-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .chart-container {
+            padding: 24px;
+        }
+
+        .chart-wrapper {
+            height: 250px;
+        }
+
+        .summary-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .section-header {
+            padding: 24px 24px 20px;
+        }
+
+        .user-item {
+            padding: 16px 24px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-title {
+            font-size: 24px;
+        }
+
+        .summary-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrapper {
+            height: 200px;
+        }
+
+        .user-item {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+    }
+</style>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">
+            <i class="fas fa-tachometer-alt"></i>
+            Dashboard
+        </h1>
+        <p class="dashboard-subtitle">Overview of user management system</p>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-users text-gray-400 text-2xl"></i>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ total_users }}</dd>
-                        </dl>
-                    </div>
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-value">{{ total_users }}</div>
+            <div class="summary-label">Total Users</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-value">{{ active_users }}</div>
+            <div class="summary-label">Active Users</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-value">{{ inactive_users }}</div>
+            <div class="summary-label">Inactive Users</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-value">{{ staff_users }}</div>
+            <div class="summary-label">Staff Users</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="charts-grid">
+            <!-- Bar Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        User Statistics
+                    </h3>
+                    <p class="chart-subtitle">User distribution overview</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="userBarChart"></canvas>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-user-check text-green-400 text-2xl"></i>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Active Users</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ active_users }}</dd>
-                        </dl>
-                    </div>
+            <!-- Pie Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        User Status Distribution
+                    </h3>
+                    <p class="chart-subtitle">Active vs Inactive users</p>
                 </div>
-            </div>
-        </div>
-
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-user-times text-red-400 text-2xl"></i>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Inactive Users</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ inactive_users }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-user-shield text-blue-400 text-2xl"></i>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Staff Users</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ staff_users }}</dd>
-                        </dl>
-                    </div>
+                <div class="chart-wrapper">
+                    <canvas id="userPieChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Recent Users -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Users</h3>
-                <a href="{% url 'user_admin:user_list' %}" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">View all</a>
+    <div class="recent-users-section">
+        <div class="section-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Recent Users
+                    </h3>
+                    <p class="section-subtitle">Latest registered users in the system</p>
+                </div>
+                <a href="{% url 'user_admin:user_list' %}" class="view-all-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    View All
+                </a>
             </div>
-            <div class="flow-root">
-                <ul class="-my-5 divide-y divide-gray-200">
-                    {% for user in recent_users %}
-                    <li class="py-4">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center">
-                                    <span class="text-sm font-medium text-white">{{ user.first_name|first }}{{ user.last_name|first }}</span>
-                                </div>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate">
-                                    {{ user.get_full_name|default:user.username }}
-                                </p>
-                                <p class="text-sm text-gray-500 truncate">{{ user.email }}</p>
-                            </div>
-                            <div class="flex-shrink-0">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if user.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                    {% if user.is_active %}Active{% else %}Inactive{% endif %}
-                                </span>
-                            </div>
-                        </div>
-                    </li>
-                    {% empty %}
-                    <li class="py-4">
-                        <p class="text-sm text-gray-500">No users found.</p>
-                    </li>
-                    {% endfor %}
-                </ul>
+        </div>
+        
+        <div class="users-list">
+            {% for user in recent_users %}
+            <div class="user-item">
+                <div class="user-avatar">
+                    {{ user.first_name|first }}{{ user.last_name|first }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">
+                        {{ user.get_full_name|default:user.username }}
+                    </div>
+                    <div class="user-email">{{ user.email }}</div>
+                </div>
+                <div class="user-status {% if user.is_active %}active{% else %}inactive{% endif %}">
+                    {% if user.is_active %}
+                        <i class="fas fa-check-circle"></i> Active
+                    {% else %}
+                        <i class="fas fa-times-circle"></i> Inactive
+                    {% endif %}
+                </div>
             </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="empty-text">No users found in the system.</div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
+
+<script>
+// Bar Chart
+const barCtx = document.getElementById('userBarChart').getContext('2d');
+const barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Total Users', 'Active Users', 'Inactive Users', 'Staff Users'],
+        datasets: [{
+            label: 'User Count',
+            data: [{{ total_users }}, {{ active_users }}, {{ inactive_users }}, {{ staff_users }}],
+            backgroundColor: [
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(239, 68, 68, 0.8)',
+                'rgba(99, 102, 241, 0.8)'
+            ],
+            borderColor: [
+                'rgba(139, 92, 246, 1)',
+                'rgba(16, 185, 129, 1)',
+                'rgba(239, 68, 68, 1)',
+                'rgba(99, 102, 241, 1)'
+            ],
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: 'white',
+                bodyColor: 'white',
+                borderColor: '#8b5cf6',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: false,
+                callbacks: {
+                    label: function(context) {
+                        return context.parsed.y + ' users';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(139, 92, 246, 0.1)',
+                    drawBorder: false
+                },
+                ticks: {
+                    color: '#6b7280',
+                    font: {
+                        weight: '600'
+                    }
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#6b7280',
+                    font: {
+                        weight: '600'
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Pie Chart
+const pieCtx = document.getElementById('userPieChart').getContext('2d');
+const pieChart = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Active Users', 'Inactive Users'],
+        datasets: [{
+            data: [{{ active_users }}, {{ inactive_users }}],
+            backgroundColor: [
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(239, 68, 68, 0.8)'
+            ],
+            borderColor: [
+                'rgba(16, 185, 129, 1)',
+                'rgba(239, 68, 68, 1)'
+            ],
+            borderWidth: 3,
+            hoverOffset: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    font: {
+                        weight: '600',
+                        size: 12
+                    },
+                    color: '#6b7280'
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: 'white',
+                bodyColor: 'white',
+                borderColor: '#8b5cf6',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: false,
+                callbacks: {
+                    label: function(context) {
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                    }
+                }
+            }
+        },
+        cutout: '60%'
+    }
+});
+</script>
 {% endblock %}

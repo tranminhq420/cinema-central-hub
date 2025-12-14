@@ -3,68 +3,483 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Admin Panel{% endblock %}</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}Admin Panel - Cinema Hub{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
-        .form-input {
-            @apply mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .form-checkbox {
-            @apply h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
         }
-        .btn-primary {
-            @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+
+        /* Admin Header */
+        .admin-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
         }
-        .btn-secondary {
-            @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+
+        .admin-header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(25px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            height: 60px;
         }
-        .btn-danger {
-            @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500;
+
+        .admin-header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-header.scrolled .admin-header-container {
+            height: 60px;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #8b5cf6;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+        }
+
+        .admin-logo:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        }
+
+        .admin-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .admin-header.scrolled .admin-logo-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+        }
+
+        .admin-logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .admin-header.scrolled .admin-logo-text {
+            font-size: 24px;
+        }
+
+        .admin-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-nav-link {
+            color: #1f2937;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .admin-nav-link i {
+            font-size: 16px;
+            width: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .admin-nav-link:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+            color: #8b5cf6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+        }
+
+        .admin-nav-link:hover i {
+            transform: scale(1.1);
+            color: #8b5cf6;
+        }
+
+        .admin-nav-link.active {
+            color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
+            font-weight: 700;
+        }
+
+        .admin-nav-link.active i {
+            color: #8b5cf6;
+            transform: scale(1.05);
+        }
+
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .admin-user-welcome {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .admin-logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .admin-logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .admin-logout-btn i {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .admin-main {
+            margin-top: 70px;
+            padding: 32px 24px;
+            min-height: calc(100vh - 70px);
+            transition: all 0.3s ease;
+        }
+
+        .admin-header.scrolled + .admin-main {
+            margin-top: 60px;
+        }
+
+        /* Messages */
+        .admin-messages {
+            margin-bottom: 24px;
+        }
+
+        .admin-message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-message.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .admin-message.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .admin-message.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .admin-message.info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .admin-message i {
+            font-size: 18px;
+        }
+
+        /* Form Styles */
+        .admin-form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            color: #1f2937;
+        }
+
+        .admin-form-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .admin-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .admin-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .admin-btn-secondary {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+        }
+
+        .admin-btn-secondary:hover {
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            transform: translateY(-1px);
+        }
+
+        .admin-btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .admin-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-header-container {
+                padding: 0 16px;
+            }
+
+            .admin-logo-text {
+                font-size: 20px;
+            }
+
+            .admin-header.scrolled .admin-logo-text {
+                font-size: 18px;
+            }
+
+            .admin-nav {
+                gap: 4px;
+            }
+
+            .admin-nav-link {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .admin-nav-link span {
+                display: none;
+            }
+
+            .admin-user-welcome {
+                display: none;
+            }
+
+            .admin-main {
+                padding: 24px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-header-container {
+                padding: 0 12px;
+            }
+
+            .admin-logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+                margin-right: 8px;
+            }
+
+            .admin-header.scrolled .admin-logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .admin-logo-text {
+                font-size: 18px;
+            }
+
+            .admin-header.scrolled .admin-logo-text {
+                font-size: 16px;
+            }
+
+            .admin-nav-link {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .admin-logout-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .admin-main {
+                padding: 20px 12px;
+            }
+        }
+
+        /* Animation for page load */
+        @keyframes adminHeaderSlideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .admin-header {
+            animation: adminHeaderSlideDown 0.6s ease-out;
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <h1 class="text-xl font-semibold text-gray-900">Admin Panel</h1>
-                    </div>
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="{% url 'user_admin:dashboard' %}" class="text-gray-900 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                        <a href="{% url 'user_admin:user_list' %}" class="text-gray-900 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Users</a>
-                    </div>
+<body>
+    <header class="admin-header">
+        <div class="admin-header-container">
+            <a href="{% url 'user_admin:dashboard' %}" class="admin-logo">
+                <div class="admin-logo-icon">
+                    <i class="fas fa-shield-alt"></i>
                 </div>
-                <div class="flex items-center">
-                    <span class="text-sm text-gray-500 mr-4">Welcome, {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
+                <span class="admin-logo-text">Admin Hub</span>
+            </a>
+            
+            <nav class="admin-nav">
+                <a href="{% url 'user_admin:dashboard' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'user_admin:user_list' %}" class="admin-nav-link {% if 'user_list' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="{% url 'user_admin:user_create' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'user_create' %}active{% endif %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add User</span>
+                </a>
+            </nav>
+
+            <div class="admin-user-info">
+                <span class="admin-user-welcome">Welcome, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="admin-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Messages -->
+    <main class="admin-main">
         {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% elif message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+        <div class="admin-messages">
+            {% for message in messages %}
+            <div class="admin-message {{ message.tags }}">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                {{ message }}
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
 
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
     <script>
+        // Admin Header Scroll Effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.admin-header');
+            const main = document.querySelector('.admin-main');
+            
+            function handleScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            }
+            
+            window.addEventListener('scroll', handleScroll);
+            handleScroll(); // Initial check
+        });
+
         // Toggle user status via AJAX
         function toggleUserStatus(userId) {
             fetch(`/cinemas/user-admin/users/${userId}/toggle-status/`, {
@@ -107,5 +522,6 @@
             return confirm(`Are you sure you want to ${actionText} ${selected.length} selected user(s)?`);
         }
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

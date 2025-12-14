@@ -1,0 +1,15 @@
+# Core Django framework
+django==4.2.21
+asgiref==3.8.1
+sqlparse==0.5.3
+
+# Database drivers (choose one depending on what you use)
+mysqlclient==2.2.7        # Recommended native driver
+PyMySQL==1.1.1            # Pure Python alternative
+
+# Optional: timezone and date utilities (Django often uses these)
+pytz==2019.3
+python-dateutil==2.9.0.post0
+
+# Optional: environment variable support (if you use .env files)
+django-environ==0.11.2    # (not in your list, but commonly added)

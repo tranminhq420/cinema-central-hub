@@ -1,212 +1,121 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    /* Header Styles */
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .header-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 28px;
-      font-weight: bold;
-      text-decoration: none;
-      color: white;
-    }
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
-      font-size: 20px;
-    }
-    .nav-menu {
-      display: flex;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      gap: 30px;
-    }
-    .nav-link {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      transition: opacity 0.3s;
-    }
-    .nav-link:hover {
-      opacity: 0.8;
-    }
+{% extends 'base.html' %}
+{% load static %}
 
-    /* Movie Styles */
-    .movie-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 16px;
-    }
-    .movie-grid {
-      display: flex;
-      flex-wrap: wrap;
-      margin: -8px;
-    }
-    .movie-item {
-      width: 33.33%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    .movie-card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      transition: box-shadow 0.3s;
-    }
-    .movie-card:hover {
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-    .movie-image {
-      width: 100%;
-      height: 320px;
-      object-fit: cover;
-    }
-    .movie-content {
-      padding: 16px;
-      text-align: center;
-    }
-    .movie-title {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #1f2937;
-    }
-    .movie-genre {
-      background: #dbeafe;
-      color: #1e40af;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      display: inline-block;
-      margin-bottom: 12px;
-    }
-    .movie-button {
-      background: #2563eb;
-      color: white;
-      padding: 8px 24px;
-      border-radius: 20px;
-      text-decoration: none;
-      display: inline-block;
-      font-weight: 500;
-      transition: background 0.3s;
-    }
-    .movie-button:hover {
-      background: #1d4ed8;
-    }
-    .age-limit {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #dc2626;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: bold;
-    }
-    .no-image {
-      width: 100%;
-      height: 320px;
-      background: #f3f4f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #6b7280;
-    }
-  </style>
-</head>
-<body>
-  {% load static %}
+{% block title %}Home - Cinema Central Hub{% endblock %}
 
-  <!-- Header Section -->
-  <header class="header">
-    <div class="header-container">
-      <a href="/" class="logo">
-        <div class="logo-icon">🎬</div>
-        Cinema Hub
-      </a>
-      <nav>
-        <ul class="nav-menu">
-          <li><a href="{% url 'films' %}" class="nav-link">Home</a></li>
-          <li><a href="#" class="nav-link">Theaters</a></li>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'my_shows' %}" class="nav-link">Showtimes</a></li>
-            <li><a href="{% url 'logout' %}" class="nav-link">Logout ({{ user.username }})</a></li>
-          {% else %}
-            <li><a href="{% url 'login' %}" class="nav-link">Login</a></li>
-            <li><a href="{% url 'register' %}" class="nav-link">Register</a></li>
-          {% endif %}
-        </ul>
-      </nav>
+{% block content %}
+<!-- Simple Slider -->
+<div class="simple-slider">
+    <div class="slider-container">
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80" alt="Movie Theater">
+            <div class="slide-content">
+                <h2 class="slide-title">Discover Amazing Movies</h2>
+                <p class="slide-description">Experience the magic of cinema with our latest releases</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80" alt="Premium Cinema">
+            <div class="slide-content">
+                <h2 class="slide-title">Premium Experience</h2>
+                <p class="slide-description">Enjoy movies in ultimate comfort and quality</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80" alt="Movie Experience">
+            <div class="slide-content">
+                <h2 class="slide-title">Book Your Tickets</h2>
+                <p class="slide-description">Reserve the best seats for your favorite movies</p>
+            </div>
+        </div>
     </div>
-  </header>
 
-  {% block content %}
+    <div class="slider-nav">
+        <div class="slider-dot active" data-slide="0"></div>
+        <div class="slider-dot" data-slide="1"></div>
+        <div class="slider-dot" data-slide="2"></div>
+    </div>
+
+    <div class="slider-arrows">
+        <div class="slider-arrow" id="prevSlide">←</div>
+        <div class="slider-arrow" id="nextSlide">→</div>
+    </div>
+</div>
+
+<!-- Now Showing Section -->
+<div class="section-header">
+    <h2 class="section-title">Now Showing</h2>
+    <p class="section-description">Discover the latest blockbusters and must-see films currently playing in our theaters.</p>
+</div>
+
+<div class="category-tabs">
+    <div class="category-tab active">All</div>
+    <div class="category-tab">Action</div>
+    <div class="category-tab">Drama</div>
+    <div class="category-tab">Comedy</div>
+    <div class="category-tab">Horror</div>
+</div>
+
   <div class="movie-container">
     {% if films %}
     <div class="movie-grid">
     {% for movie in films %}
-      <div class="movie-item">
         <div class="movie-card">
-          <div style="position: relative;">
+            <div class="movie-poster-wrapper">
               {% if movie.image_url %}
-              <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-image">
+                <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-poster">
               {% else %}
-              <div class="no-image">
-                  <span>No Image</span>
+                <div class="movie-poster" style="background: var(--bg-light); display: flex; align-items: center; justify-content: center;">
+                    <span style="color: var(--text-light); font-size: 1.5rem;">🎬</span>
               </div>
               {% endif %}
+                
+                <div class="movie-overlay"></div>
 
               {% if movie.age_limit %}
-              <div class="age-limit">
+                <div class="movie-age-rating">
                   {{ movie.age_limit }}
               </div>
               {% endif %}
+
+                {% if movie.price %}
+                <div class="movie-rating">
+                    <span>💰</span>
+                    {{ movie.price }}
+                </div>
+                {% endif %}
           </div>
 
           <div class="movie-content">
-              <h3 class="movie-title">
-                  {{ movie.title }}
-              </h3>
+                <h3 class="movie-title">{{ movie.title }}</h3>
 
+                <div class="movie-meta">
               {% if movie.genre %}
-              <div>
-                  <span class="movie-genre">
-                      {{ movie.genre }}
-                  </span>
-              </div>
+                    <span class="movie-tag genre">{{ movie.genre }}</span>
+                    {% endif %}
+                    
+                    {% if movie.movie_type %}
+                    <span class="movie-tag">{{ movie.movie_type }}</span>
               {% endif %}
 
+                    {% if movie.format %}
+                    <span class="movie-tag format">{{ movie.format }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="movie-actions">
               {% if movie.slug %}
-                <a href="{% url 'movie_detail' movie.slug %}" class="movie-button">
-                    View Details
+                    <a href="{% url 'movie_detail' movie.slug %}" class="movie-btn movie-btn-primary">
+                        <span>🎬</span> View Details
                 </a>
+                    {% if movie.booking_url %}
+                    <a href="{{ movie.booking_url }}" target="_blank" class="movie-btn movie-btn-secondary">
+                        <span>🎟️</span> Book
+                    </a>
+                    {% endif %}
               {% else %}
-                <span class="movie-button" style="background: #9ca3af; cursor: not-allowed;">
-                    Details Unavailable
+                    <span class="movie-btn" style="background: var(--text-light); color: var(--bg-white); cursor: not-allowed;">
+                        Not Available
                 </span>
               {% endif %}
           </div>
@@ -214,38 +123,137 @@
       </div>
     {% endfor %}
     </div>
+    {% else %}
+    <div class="text-center" style="padding: var(--spacing-xl) 0;">
+        <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">🎬</div>
+        <h2 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: var(--spacing-md);">
+            No movies available at the moment
+        </h2>
+        <p style="color: var(--text-secondary);">
+            Please check back later for new releases.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Featured Movie Section -->
+{% if films.first %}
+<div class="featured-section">
+    <div class="container">
+        <div class="featured-grid">
+            <div class="featured-content">
+                <h2 class="featured-title">Featured: {{ films.first.title }}</h2>
+                <p class="featured-description">{{ films.first.description|truncatewords:50 }}</p>
+                <div class="movie-actions">
+                    {% if films.first.slug %}
+                    <a href="{% url 'movie_detail' films.first.slug %}" class="movie-btn movie-btn-primary">
+                        <span>🎬</span> Learn More
+                    </a>
+                    {% endif %}
+                    {% if films.first.booking_url %}
+                    <a href="{{ films.first.booking_url }}" target="_blank" class="movie-btn movie-btn-secondary">
+                        <span>🎟️</span> Get Tickets
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="featured-image">
+                {% if films.first.image_url %}
+                <img src="{{ films.first.image_url }}" alt="{{ films.first.title }}">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
   {% endif %}
 
-    
+<!-- Coming Soon Section -->
+<div class="section-header">
+    <h2 class="section-title">Coming Soon</h2>
+    <p class="section-description">Get a sneak peek at upcoming releases and be the first to book tickets.</p>
+</div>
+
+<div class="coming-soon-slider">
+    <div class="coming-soon-track">
+        {% for movie in films|slice:":5" %}
+        <div class="coming-soon-card">
+            <div class="movie-card">
+                <div class="movie-poster-wrapper">
+                    {% if movie.image_url %}
+                    <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="movie-poster">
+                    {% endif %}
+                    <div class="movie-overlay"></div>
+                </div>
+                <div class="movie-content">
+                    <h3 class="movie-title">{{ movie.title }}</h3>
+                    <div class="movie-meta">
+                        {% if movie.genre %}
+                        <span class="movie-tag genre">{{ movie.genre }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
   </div>
   
-  <script>
-  // Filter functionality
-  document.getElementById('genre-filter').addEventListener('change', function() {
-      updateFilters();
-  });
-  
-  document.getElementById('type-filter').addEventListener('change', function() {
-      updateFilters();
-  });
-  
-  document.getElementById('format-filter').addEventListener('change', function() {
-      updateFilters();
-  });
-  
-  function updateFilters() {
-      const genre = document.getElementById('genre-filter').value;
-      const type = document.getElementById('type-filter').value;
-      const format = document.getElementById('format-filter').value;
-      
-      const params = new URLSearchParams();
-      if (genre) params.append('genre', genre);
-      if (type) params.append('movie_type', type);
-      if (format) params.append('format', format);
-      
-      window.location.href = '?' + params.toString();
-  }
-  </script>
-  {% endblock %}
-</body>
-</html>
+<!-- Newsletter Section -->
+<div class="newsletter-section">
+    <div class="container">
+        <div class="newsletter-content">
+            <h2 class="newsletter-title">Stay Updated</h2>
+            <p class="newsletter-description">Subscribe to our newsletter for exclusive movie updates, special offers, and more!</p>
+            <form class="newsletter-form">
+                <input type="email" class="newsletter-input" placeholder="Enter your email address">
+                <button type="submit" class="newsletter-button">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.querySelector('.slider-container');
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slider-dot');
+    const prevButton = document.querySelector('#prevSlide');
+    const nextButton = document.querySelector('#nextSlide');
+    let currentSlide = 0;
+    const slideCount = slides.length;
+    const slideInterval = 5000; // 5 seconds
+
+    function updateSlider() {
+        slider.style.transform = `translateX(-${currentSlide * 33.333}%)`;
+        dots.forEach(dot => dot.classList.remove('active'));
+        dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % slideCount;
+        updateSlider();
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + slideCount) % slideCount;
+        updateSlider();
+    }
+
+    // Event Listeners
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentSlide = index;
+            updateSlider();
+        });
+    });
+
+    prevButton.addEventListener('click', prevSlide);
+    nextButton.addEventListener('click', nextSlide);
+
+    // Auto advance slides
+    setInterval(nextSlide, slideInterval);
+});
+</script>
+{% endblock %}

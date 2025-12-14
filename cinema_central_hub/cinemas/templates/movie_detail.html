@@ -1,454 +1,240 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    /* Header Styles */
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .header-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 28px;
-      font-weight: bold;
-      text-decoration: none;
-      color: white;
-    }
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
-      font-size: 20px;
-    }
-    .nav-menu {
-      display: flex;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      gap: 30px;
-    }
-    .nav-link {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      transition: opacity 0.3s;
-    }
-    .nav-link:hover {
-      opacity: 0.8;
-    }
+{% extends 'base.html' %}
+{% load static %}
 
-    /* Page Styles */
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f8f9fa;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 16px;
-    }
-    .back-link {
-      display: inline-block;
-      color: #667eea;
-      text-decoration: none;
-      margin-bottom: 24px;
-      font-weight: 500;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
-    .movie-hero {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      margin-bottom: 32px;
-    }
-    .movie-content {
-      display: flex;
-      gap: 32px;
-      padding: 32px;
-    }
-    .movie-poster {
-      flex-shrink: 0;
-    }
-    .movie-poster img {
-      width: 300px;
-      height: 450px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .movie-info {
-      flex: 1;
-    }
-    .movie-title {
-      font-size: 36px;
-      font-weight: bold;
-      color: #1f2937;
-      margin-bottom: 16px;
-    }
-    .movie-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .meta-item {
-      background: #f3f4f6;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      color: #4b5563;
-    }
-    .age-rating {
-      background: #fef2f2;
-      color: #dc2626;
-      font-weight: bold;
-    }
-    .genre-tag {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-    .movie-description {
-      color: #6b7280;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-    .price-info {
-      font-size: 18px;
-      font-weight: 600;
-      color: #059669;
-    }
+{% block title %}{{ film.title }} - Cinema Central Hub{% endblock %}
 
-    /* Screenings Section */
-    .screenings-section {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 32px;
-    }
-    .section-title {
-      font-size: 24px;
-      font-weight: bold;
-      color: #1f2937;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .theater-group {
-      margin-bottom: 32px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .theater-name {
-      background: #f9fafb;
-      padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #374151;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .screenings-grid {
-      padding: 24px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .screening-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 16px;
-      background: #fafafa;
-      transition: all 0.3s;
-    }
-    .screening-card:hover {
-      background: #f0f9ff;
-      border-color: #3b82f6;
-    }
-    .screening-time {
-      font-size: 18px;
-      font-weight: bold;
-      color: #1f2937;
-      margin-bottom: 8px;
-    }
-    .screening-date {
-      color: #6b7280;
-      margin-bottom: 8px;
-    }
-    .screening-details {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .detail-tag {
-      background: #e0e7ff;
-      color: #3730a3;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-    }
-    .book-btn {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      width: 100%;
-      transition: background 0.3s;
-    }
-    .book-btn:hover {
-      background: #2563eb;
-    }
-    .no-screenings {
-      text-align: center;
-      color: #6b7280;
-      padding: 48px;
-      font-size: 18px;
-    }
-  </style>
-</head>
-<body>
-  <!-- Header Section -->
-  <header class="header">
-    <div class="header-container">
-      <a href="/" class="logo">
-        <div class="logo-icon">🎬</div>
-        Cinema Hub
-      </a>
-      <nav>
-        <ul class="nav-menu">
-          <li><a href="{% url 'films' %}" class="nav-link">Home</a></li>
-          <li><a href="#" class="nav-link">Theaters</a></li>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'my_shows' %}" class="nav-link">Showtimes</a></li>
-            <li><a href="{% url 'logout' %}" class="nav-link">Logout ({{ user.username }})</a></li>
-          {% else %}
-            <li><a href="{% url 'login' %}" class="nav-link">Login</a></li>
-            <li><a href="{% url 'register' %}" class="nav-link">Register</a></li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <div class="container">
-    <a href="{% url 'films' %}" class="back-link">← Back to Movies</a>
-    
-    <!-- Movie Information -->
-    <div class="movie-hero">
-      <div class="movie-content">
-        <div class="movie-poster">
-          {% if film.image_url %}
-            <img src="{{ film.image_url }}" alt="{{ film.title }}">
-          {% else %}
-            <div style="width: 300px; height: 450px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #6b7280;">
-              No Image Available
-            </div>
-          {% endif %}
-        </div>
+{% block content %}
+<div class="movie-detail">
+    <!-- Hero Section -->
+    <div class="movie-detail-hero">
+        {% if film.image_url %}
+        <img src="{{ film.image_url }}" alt="{{ film.title }}" class="movie-backdrop">
+        {% endif %}
+        <div class="movie-backdrop-overlay"></div>
         
-        <div class="movie-info">
-          <h1 class="movie-title">{{ film.title }}</h1>
-          
-          <div class="movie-meta">
-            {% if film.age_limit %}
-              <span class="meta-item age-rating">{{ film.age_limit }}</span>
-            {% endif %}
-            {% if film.genre %}
-              <span class="meta-item genre-tag">{{ film.genre }}</span>
-            {% endif %}
-            {% if film.movie_type %}
-              <span class="meta-item">{{ film.movie_type }}</span>
-            {% endif %}
-            {% if film.format %}
-              <span class="meta-item">{{ film.format }}</span>
-            {% endif %}
-          </div>
-          
-          {% if film.description %}
-            <div class="movie-description">
-              {{ film.description }}
-            </div>
-          {% endif %}
-          
-          {% if film.price %}
-            <div class="price-info">
-              Price: {{ film.price }}
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Screenings Section -->
-    <div class="screenings-section">
-      <h2 class="section-title">
-        🎭 Showtimes ({{ total_screenings }} screenings available)
-      </h2>
-      
-      {% if theaters %}
-        {% for theater_name, screenings in theaters.items %}
-          <div class="theater-group">
-            <div class="theater-name">{{ theater_name }}</div>
-            <div class="screenings-grid">
-              {% for screening in screenings %}
-                <div class="screening-card">
-                  <div class="screening-time">{{ screening.time|time:"H:i" }}</div>
-                  <div class="screening-date">
-                    {% if screening.proper_date %}
-                      {{ screening.proper_date|date:"l, F d, Y" }}
-                    {% else %}
-                      Unable to parse date: {{ screening.date }}
+        <div class="container">
+            <div class="movie-detail-content">
+                <div class="movie-poster-wrap">
+                    {% if film.image_url %}
+                    <img src="{{ film.image_url }}" alt="{{ film.title }}">
                     {% endif %}
-                  </div>
-                  <div class="screening-details">
-                    {% if screening.format %}
-                      <span class="detail-tag">{{ screening.format }}</span>
-                    {% endif %}
-                    {% if screening.language %}
-                      <span class="detail-tag">{{ screening.language }}</span>
-                    {% endif %}
-                    {% if screening.firstclass == 'True' %}
-                      <span class="detail-tag">First Class</span>
-                    {% endif %}
-                  </div>
-                  
-                  <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <a href="{{ film.booking_url }}" target="_blank" class="book-btn" style="flex: 1; text-align: center; text-decoration: none;">
-                      Book Tickets
-                    </a>
-                    
-                    {% if user.is_authenticated %}
-                      {% if screening.is_saved %}
-                        <button onclick="removeFromMyShows({{ screening.id }})" 
-                                class="my-shows-btn saved" 
-                                id="btn-{{ screening.id }}"
-                                style="background: #dc2626; color: white; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                          ✓ Added
-                        </button>
-                      {% else %}
-                        <button onclick="addToMyShows({{ screening.id }})" 
-                                class="my-shows-btn" 
-                                id="btn-{{ screening.id }}"
-                                style="background: #10b981; color: white; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                          + Add
-                        </button>
-                      {% endif %}
-                    {% endif %}
-                  </div>
                 </div>
-              {% endfor %}
+                
+                <div class="movie-info">
+                    <h1 class="movie-title-large">{{ film.title }}</h1>
+                    
+                    <div class="movie-meta-tags">
+                        {% if film.age_limit %}
+                        <span class="meta-tag age">{{ film.age_limit }}</span>
+                        {% endif %}
+                        
+                        {% if film.genre %}
+                        <span class="meta-tag genre">{{ film.genre }}</span>
+                        {% endif %}
+                        
+                        {% if film.movie_type %}
+                        <span class="meta-tag">{{ film.movie_type }}</span>
+                        {% endif %}
+                        
+                        {% if film.format %}
+                        <span class="meta-tag format">{{ film.format }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if film.description %}
+                    <div class="movie-description">
+                        {{ film.description }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if film.price %}
+                    <div class="movie-price-large">
+                        Giá vé: {{ film.price }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="movie-actions">
+                        {% if film.booking_url %}
+                        <a href="{{ film.booking_url }}" target="_blank" class="action-button primary">
+                            <i class="fas fa-ticket-alt"></i>
+                            Đặt vé ngay
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'films' %}" class="action-button secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Quay lại
+                        </a>
+                    </div>
+                </div>
             </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="no-screenings">
-          <p>No screenings available for this movie at the moment.</p>
-          <p>Please check back later or contact us for more information.</p>
         </div>
-      {% endif %}
     </div>
-  </div>
 
-  <script>
-    function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
+    <!-- Showtimes Section -->
+    <div class="container">
+        <div class="showtimes-section">
+            <div class="section-title-wrap">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Lịch chiếu
+                </h2>
+                <div class="total-shows">
+                    {{ total_screenings }} suất chiếu
+                </div>
+            </div>
+
+            {% if theaters %}
+            {% for theater_name, screenings in theaters.items %}
+            <div class="theater-card">
+                <div class="theater-header">
+                    <div class="theater-info">
+                        <h3 class="theater-name">{{ theater_name }}</h3>
+                        <div class="theater-distance">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Cách đây 3km</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="showtime-grid">
+                    {% for screening in screenings %}
+                    <div class="showtime-card">
+                        <div class="showtime-time">{{ screening.time|time:"H:i" }}</div>
+                        <div class="showtime-date">
+                            {% if screening.proper_date %}
+                            {{ screening.proper_date|date:"l, d/m/Y" }}
+                            {% else %}
+                            {{ screening.date }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="showtime-tags">
+                            {% if screening.format %}
+                            <span class="showtime-tag">{{ screening.format }}</span>
+                            {% endif %}
+                            
+                            {% if screening.language %}
+                            <span class="showtime-tag language">{{ screening.language }}</span>
+                            {% endif %}
+                            
+                            {% if screening.firstclass == 'True' %}
+                            <span class="showtime-tag firstclass">First Class</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="showtime-actions">
+                            <a href="{{ film.booking_url }}" target="_blank" class="showtime-button book">
+                                Đặt vé
+                            </a>
+                            
+                            {% if user.is_authenticated %}
+                            {% if screening.is_saved %}
+                            <button onclick="removeFromMyShows({{ screening.id }})" 
+                                    class="showtime-button saved"
+                                    id="btn-{{ screening.id }}">
+                                ✓
+                            </button>
+                            {% else %}
+                            <button onclick="addToMyShows({{ screening.id }})" 
+                                    class="showtime-button save"
+                                    id="btn-{{ screening.id }}">
+                                +
+                            </button>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center" style="padding: var(--spacing-xl) 0;">
+                <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">🎬</div>
+                <h3 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: var(--spacing-md);">
+                    Chưa có lịch chiếu cho phim này
+                </h3>
+                <p style="color: var(--text-secondary);">
+                    Vui lòng quay lại sau hoặc liên hệ chúng tôi để biết thêm thông tin.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
-      }
-      return cookieValue;
     }
+    return cookieValue;
+}
 
-    function addToMyShows(screeningId) {
-      const csrftoken = getCookie('csrftoken');
-      const button = document.getElementById('btn-' + screeningId);
-      
-      fetch("{% url 'add_to_my_shows' %}", {
+function addToMyShows(screeningId) {
+    const csrftoken = getCookie('csrftoken');
+    const button = document.getElementById('btn-' + screeningId);
+    
+    fetch("{% url 'add_to_my_shows' %}", {
         method: 'POST',
         headers: {
-          'X-CSRFToken': csrftoken,
-          'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: 'screening_id=' + screeningId + '&film_slug={{ film_slug }}'
-      })
-      .then(response => response.json())
-      .then(data => {
+    })
+    .then(response => response.json())
+    .then(data => {
         if (data.success) {
-          if (data.action === 'added') {
-            button.innerHTML = '✓ Added';
-            button.style.backgroundColor = '#dc2626';
+            button.innerHTML = '✓';
+            button.className = 'showtime-button saved';
             button.onclick = () => removeFromMyShows(screeningId);
-          } else if (data.action === 'already_exists') {
-            button.innerHTML = '✓ Added';
-            button.style.backgroundColor = '#dc2626';
-            button.onclick = () => removeFromMyShows(screeningId);
-          }
         } else {
-          alert('Error: ' + data.error);
+            alert('Error: ' + data.error);
         }
-      })
-      .catch(error => {
+    })
+    .catch(error => {
         console.error('Error:', error);
         alert('An error occurred. Please try again.');
-      });
-    }
+    });
+}
 
-    function removeFromMyShows(screeningId) {
-      const csrftoken = getCookie('csrftoken');
-      const button = document.getElementById('btn-' + screeningId);
-      
-      fetch("{% url 'remove_from_my_shows' %}", {
+function removeFromMyShows(screeningId) {
+    const csrftoken = getCookie('csrftoken');
+    const button = document.getElementById('btn-' + screeningId);
+    
+    fetch("{% url 'remove_from_my_shows' %}", {
         method: 'POST',
         headers: {
-          'X-CSRFToken': csrftoken,
-          'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: 'screening_id=' + screeningId
-      })
-      .then(response => response.json())
-      .then(data => {
+    })
+    .then(response => response.json())
+    .then(data => {
         if (data.success) {
-          button.innerHTML = '+ Add';
-          button.style.backgroundColor = '#10b981';
-          button.onclick = () => addToMyShows(screeningId);
+            button.innerHTML = '+';
+            button.className = 'showtime-button save';
+            button.onclick = () => addToMyShows(screeningId);
         } else {
-          alert('Error: ' + data.error);
+            alert('Error: ' + data.error);
         }
-      })
-      .catch(error => {
+    })
+    .catch(error => {
         console.error('Error:', error);
         alert('An error occurred. Please try again.');
-      });
-    }
-  </script>
-</body>
-</html> 
+    });
+}
+</script>
+{% endblock %} 
