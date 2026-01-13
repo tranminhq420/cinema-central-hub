@@ -48,13 +48,13 @@
     <p class="section-description">Discover the latest blockbusters and must-see films currently playing in our theaters.</p>
 </div>
 
-<div class="category-tabs">
+{% comment %} <div class="category-tabs">
     <div class="category-tab active">All</div>
     <div class="category-tab">Action</div>
     <div class="category-tab">Drama</div>
     <div class="category-tab">Comedy</div>
     <div class="category-tab">Horror</div>
-</div>
+</div> {% endcomment %}
 
   <div class="movie-container">
     {% if films %}
@@ -113,10 +113,24 @@
                         <span>🎟️</span> Book
                     </a>
                     {% endif %}
-              {% else %}
-                    <span class="movie-btn" style="background: var(--text-light); color: var(--bg-white); cursor: not-allowed;">
-                        Not Available
-                </span>
+              {% elif movie.cgv_id %}
+                    <a href="{% url 'cgv_movie_detail' movie.cgv_id %}" class="movie-btn movie-btn-primary">
+                        <span>🎬</span> View Details
+                </a>
+                    {% if movie.booking_url %}
+                    <a href="{{ movie.booking_url }}" target="_blank" class="movie-btn movie-btn-secondary">
+                        <span>🎟️</span> Book
+                    </a>
+                    {% endif %}
+                {% else %}
+                <a href="{% url 'cgv_movie_detail' movie.rqg_film_id %}" class="movie-btn movie-btn-primary">
+                        <span>🎬</span> View Details
+                </a>
+                    {% if movie.booking_url %}
+                    <a href="{{ movie.booking_url }}" target="_blank" class="movie-btn movie-btn-secondary">
+                        <span>🎟️</span> Book
+                    </a>
+                    {% endif %}
               {% endif %}
           </div>
         </div>

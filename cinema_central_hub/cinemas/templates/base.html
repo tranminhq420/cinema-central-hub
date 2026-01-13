@@ -96,6 +96,27 @@
         .main-content.scrolled {
             margin-top: 60px;
         }
+
+        .nav-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-search input {
+    padding: 6px 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.nav-search button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
     </style>
 </head>
 <body>
@@ -110,11 +131,21 @@
             </a>
             <nav>
                 <ul class="nav-menu">
+                    <li>
+                    <form method="GET" action="{% url 'films' %}" class="nav-search">
+                        <input
+                            type="text"
+                            name="q"
+                            placeholder="Search movies..."
+                            value="{{ request.GET.q|default:'' }}"
+                        />
+                        <button type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    </li>
                     <li><a href="{% url 'films' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
                         <i class="fas fa-home"></i> Home
-                    </a></li>
-                    <li><a href="#" class="nav-link">
-                        <i class="fas fa-building"></i> Theaters
                     </a></li>
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'my_shows' %}" class="nav-link {% if 'my_shows' in request.path %}active{% endif %}">
@@ -131,7 +162,11 @@
                             <i class="fas fa-user-plus"></i> Register
                         </a></li>
                     {% endif %}
+                    
                 </ul>
+                    
+                
+
             </nav>
         </div>
     </header>

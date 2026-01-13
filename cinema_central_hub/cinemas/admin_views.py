@@ -2,7 +2,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
-from django.contrib import messages
+from django.contrib import messages, admin
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import CustomUserCreationForm
 from django import forms
 import json
+from .models import Film
 
 # Check if user is admin/staff
 
@@ -314,3 +315,37 @@ def bulk_actions(request):
             messages.success(request, f'{count} users deleted.')
 
     return redirect('admin:user_list')
+
+
+def merge_films(modeladmin, request, queryset):
+    if queryset.count() != 2:
+        messages.error(request, "Vui lòng chọn đúng 2 bản ghi Film.")
+        return
+
+    film1, film2 = queryset
+
+    # Xác định film chính (có cgv_id)
+    if film1.cgv_id and not film2.cgv_id:
+        main_film = film1
+        extra_film = film2
+    elif film2.cgv_id and not film1.cgv_id:
+        main_film = film2
+        extra_film = film1
+    else:
+        messages.error(
+            request,
+            "Cần 1 film có cgv_id và 1 film có rqg_film_id."
+        )
+        return
+
+    # Copy rqg_film_id nếu cần
+    if not main_film.rqg_film_id and extra_film.rqg_film_id:
+        main_film.rqg_film_id = extra_film.rqg_film_id
+
+    main_film.save()
+    extra_film.delete()
+
+    messages.success(
+        request,
+        f"Đã gộp film '{main_film.title}' và xoá bản ghi thừa."
+    )

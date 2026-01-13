@@ -2,11 +2,14 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+
 class Film(models.Model):
     title = models.CharField(max_length=100, null=True)
     age_limit = models.CharField(max_length=100, null=True)
     movie_type = models.CharField(max_length=100, null=True)
     format = models.CharField(max_length=100, null=True)
+    cgv_id = models.CharField(max_length=50, null=True)
+    rqg_film_id = models.CharField(max_length=200, null=True)
     genre = models.CharField(max_length=100, null=True)
     image_url = models.TextField()
     booking_url = models.TextField()
@@ -28,7 +31,10 @@ class Screentime(models.Model):
     time = models.TimeField()
     date = models.DateTimeField()
     language = models.CharField(max_length=100)
-    firstclass = models.CharField(max_length=10)
+    standard_price = models.DecimalField(
+        max_digits=100, decimal_places=2, null=True)
+    vip_price = models.DecimalField(
+        max_digits=100, decimal_places=2, null=True)
     cinema_id = models.CharField(max_length=30, null=True)
     film_id = models.CharField(max_length=50, null=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -68,15 +74,15 @@ class SeatData(models.Model):
     screen_number = models.IntegerField()
     seats_available = models.IntegerField()
     expire_time = models.DateTimeField()
-    
+
     tickets_data = models.JSONField()
     seats_layout = models.JSONField()
     concession_items = models.JSONField()
-    
+
     standard_price = models.DecimalField(max_digits=10, decimal_places=2)
     vip_price = models.DecimalField(max_digits=10, decimal_places=2)
     couple_price = models.DecimalField(max_digits=10, decimal_places=2)
-    
+
     search_date = models.CharField(max_length=20)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -91,7 +97,8 @@ class SeatData(models.Model):
 class UserShowing(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     screening_id = models.IntegerField()  # References Screentime.id
-    film_slug = models.CharField(max_length=200)  # Store film slug for easy access
+    # Store film slug for easy access
+    film_slug = models.CharField(max_length=200)
     added_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -106,3 +113,15 @@ class UserShowing(models.Model):
             return Screentime.objects.get(id=self.screening_id)
         except Screentime.DoesNotExist:
             return None
+
+
+class SeatPrice(models.Model):
+    screentime_name = models.CharField(max_length=100)
+    seat_type = models.CharField(max_length=50)
+    price = models.IntegerField()
+
+    class Meta:
+        unique_together = ("screentime_name", "seat_type")
+
+    def __str__(self):
+        return f"{self.seat_type} - {self.price}"

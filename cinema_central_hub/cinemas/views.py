@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
+from django.db.models import Q
 
 
 def extract_film_slug(booking_url):
@@ -27,31 +28,18 @@ def extract_film_slug(booking_url):
     return None
 
 
-def parse_custom_date(date_str):
-    """Parse custom date format YY-DD-MM to proper datetime
-    Example: 2025-03-06 means June 3rd, 2025 (YY-DD-MM)
-    """
-    if isinstance(date_str, datetime):
-        # If it's already a datetime object, extract components and reconstruct
-        year = date_str.year
-        day = date_str.month  # In the stored datetime, the day is actually in the month position
-        month = date_str.day  # In the stored datetime, the month is actually in the day position
-        return datetime(year, month, day)
+def parse_custom_date(date_value):
+    # Nếu đã là datetime → dùng luôn
+    if isinstance(date_value, datetime):
+        return date_value
 
-    if date_str:
+    # Nếu là string YYYY-MM-DD
+    if isinstance(date_value, str):
         try:
-            # For string format: 2025-03-06 means June 3rd, 2025
-            # First part (2025) is year
-            # Second part (03) is day
-            # Third part (06) is month
-            parts = str(date_str).split('-')
-            if len(parts) == 3:
-                year = int(parts[0])    # 2025
-                day = int(parts[1])     # 03 (3rd day)
-                month = int(parts[2])   # 06 (June)
-                return datetime(year, month, day)
-        except (ValueError, IndexError) as e:
-            print(f"Error parsing date {date_str}: {e}")
+            return datetime.strptime(date_value, "%Y-%m-%d")
+        except ValueError:
+            pass
+
     return None
 
 # Create your views here.
@@ -61,6 +49,12 @@ def get_films(request):
 
     # View for displaying list of movies with filtering and pagination
     films = Film.objects.all()
+
+    query = request.GET.get('q')
+    if query:
+        films = films.filter(
+            Q(title__icontains=query)
+        )
 
     # Add film slug to each film for URL generation
     for film in films:
@@ -83,7 +77,11 @@ def movie_detail(request, film_slug):
 
     # Get all screenings for this movie using the film slug directly
     screenings = Screentime.objects.filter(
-        film_id=film_slug).order_by('date', 'time')
+        film_id=film_slug
+    ).exclude(
+        standard_price=0,
+        vip_price=0
+    ).order_by('date', 'time')
 
     # Parse custom date format and add proper date to each screening
     for screening in screenings:
@@ -116,6 +114,69 @@ def movie_detail(request, film_slug):
         'theaters': theaters,
         'total_screenings': screenings.count(),
         'film_slug': film_slug
+    }
+
+    return render(request, 'movie_detail.html', context)
+
+
+def cgv_movie_detail(request, cgv_id):
+    # Find the film by matching the slug in the booking_url
+    # Use regex to match the exact slug pattern in the URL
+    # dd(cgv_id)
+    films = Film.objects.filter(
+        cgv_id=cgv_id)
+    i = 0
+    # dd(films)
+    if not films.exists():
+        # Fallback: try broader search if exact match fails
+        films = Film.objects.filter(
+            rqg_film_id=cgv_id)
+        i = 1
+    film = get_object_or_404(films)
+    if i == 0:
+        other_id = film.rqg_film_id
+    else:
+        other_id = film.cgv_id
+
+    # Get all screenings for this movie using the film slug directly
+    screenings = Screentime.objects.filter(
+        Q(film_id=cgv_id) |
+        Q(film_id=other_id)
+    ).order_by('date', 'time')
+
+    # dd(screenings)
+    # Parse custom date format and add proper date to each screening
+    for screening in screenings:
+        screening.proper_date = parse_custom_date(screening.date)
+
+        # Check if user has added this screening to their list
+        if request.user.is_authenticated:
+            screening.is_saved = UserShowing.objects.filter(
+                user=request.user,
+                screening_id=screening.id
+            ).exists()
+        else:
+            screening.is_saved = False
+
+    # Group screenings by theater
+    theaters = {}
+    for screening in screenings:
+        try:
+            theater = Theater.objects.filter(
+                theater_id=screening.cinema_id).first()
+            theater_name = theater.name
+        except Theater.DoesNotExist:
+            theater_name = f"Theater {screening.cinema_id}"
+
+        if theater_name not in theaters:
+            theaters[theater_name] = []
+        theaters[theater_name].append(screening)
+
+    context = {
+        'film': film,
+        'theaters': theaters,
+        'total_screenings': screenings.count(),
+        'film_slug': cgv_id
     }
 
     return render(request, 'movie_detail.html', context)

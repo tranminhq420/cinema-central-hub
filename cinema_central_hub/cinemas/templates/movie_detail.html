@@ -4,6 +4,55 @@
 {% block title %}{{ film.title }} - Cinema Central Hub{% endblock %}
 
 {% block content %}
+<style>
+    .theater-filter {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theater-filter select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.price-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.price-filter label {
+    font-weight: 600;
+}
+
+.price-filter input {
+    width: 110px;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.price-filter button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #2d7be5;
+    color: #fff;
+    font-weight: 500;
+}
+
+.price-filter button.reset {
+    background: #aaa;
+}
+
+</style>
 <div class="movie-detail">
     <!-- Hero Section -->
     <div class="movie-detail-hero">
@@ -83,9 +132,34 @@
                 </div>
             </div>
 
+
+           <div class="theater-filter">
+                <label for="theaterSelect">Lọc theo rạp:</label>
+                <select id="theaterSelect">
+                    <option value="all">Tất cả rạp</option>
+                    {% for theater_name, screenings in theaters.items %}
+                        <option value="{{ theater_name|slugify }}">
+                            {{ theater_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="price-filter">
+                <label>Giá vé:</label>
+
+                <input type="number" id="minPrice" placeholder="Từ (VND)">
+                <span>–</span>
+                <input type="number" id="maxPrice" placeholder="Đến (VND)">
+
+                <button onclick="filterByPrice()">Lọc</button>
+                <button class="reset" onclick="resetFilter()">Reset</button>
+            </div>
+
+
             {% if theaters %}
             {% for theater_name, screenings in theaters.items %}
-            <div class="theater-card">
+            <div class="theater-card" data-theater="{{ theater_name|slugify }}">
                 <div class="theater-header">
                     <div class="theater-info">
                         <h3 class="theater-name">{{ theater_name }}</h3>
@@ -107,7 +181,24 @@
                             {{ screening.date }}
                             {% endif %}
                         </div>
-                        
+
+
+                        <div class="showtime-price" data-price="{{ screening.standard_price|default:screening.vip_price }}">
+                            <span class="label">Giá vé:</span>
+                        </br>
+                            <span class="price standard">
+                                VIP: <strong>{{ screening.standard_price }}</strong> VND
+                            </span>
+
+                        </br>
+
+                            <span class="price vip">
+                                STANDARD: <strong>{{ screening.vip_price }}</strong> VND
+                            </span>
+                        </div>
+
+
+
                         <div class="showtime-tags">
                             {% if screening.format %}
                             <span class="showtime-tag">{{ screening.format }}</span>
@@ -181,6 +272,27 @@ function getCookie(name) {
     return cookieValue;
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("theaterSelect");
+    const theaters = document.querySelectorAll(".theater-card");
+
+    select.addEventListener("change", function () {
+        const selected = this.value;
+
+        theaters.forEach(card => {
+            if (selected === "all" || card.dataset.theater === selected) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    });
+});
+
+
+
+
+
 function addToMyShows(screeningId) {
     const csrftoken = getCookie('csrftoken');
     const button = document.getElementById('btn-' + screeningId);
@@ -236,5 +348,30 @@ function removeFromMyShows(screeningId) {
         alert('An error occurred. Please try again.');
     });
 }
+
+function filterByPrice() {
+    const min = parseInt(document.getElementById("minPrice").value) || 0;
+    const max = parseInt(document.getElementById("maxPrice").value) || Infinity;
+
+    document.querySelectorAll(".screening-item").forEach(item => {
+        const price = parseInt(item.dataset.price);
+
+        if (price >= min && price <= max) {
+            item.style.display = "";
+        } else {
+            item.style.display = "none";
+        }
+    });
+}
+
+function resetFilter() {
+    document.getElementById("minPrice").value = "";
+    document.getElementById("maxPrice").value = "";
+
+    document.querySelectorAll(".screening-item").forEach(item => {
+        item.style.display = "";
+    });
+}
+
 </script>
 {% endblock %} 
